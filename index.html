@@ -18,89 +18,99 @@
 </head>
 <body>
 
-  <h1>🌊 Sistem Peringatan Dini Abrasi Pesisir</h1>
+<h1>🌊 Sistem Peringatan Dini Abrasi Pesisir</h1>
 
-  <!-- Banner Notifikasi -->
-  <div id="banner-notif">
-    ⚠ Risiko Abrasi Tinggi! Harap waspada!
-  </div>
+<!-- Banner Notifikasi -->
+<div id="banner-notif">
+  ⚠ Risiko Abrasi Tinggi! Harap waspada!
+</div>
 
-  <div class="card">
-    <label>Tinggi Gelombang (m)</label>
-    <input type="number" id="gelombang" step="0.1">
+<div class="card">
+  <label>Tinggi Gelombang (m)</label>
+  <input type="number" id="gelombang" step="0.1">
 
-    <label>Kecepatan Arus (m/s)</label>
-    <input type="number" id="arus" step="0.1">
+  <label>Kecepatan Arus (m/s)</label>
+  <input type="number" id="arus" step="0.1">
 
-    <label>Pasang Surut (m)</label>
-    <input type="number" id="pasut" step="0.1">
+  <label>Pasang Surut (m)</label>
+  <input type="number" id="pasut" step="0.1">
 
-    <button onclick="hitungRisiko()">Cek Risiko Abrasi</button>
-  </div>
+  <button onclick="hitungRisiko()">Cek Risiko Abrasi</button>
+</div>
 
-  <button onclick="mintaIzinNotifikasi()">Aktifkan Notifikasi</button>
+<button onclick="aktifkanNotifikasi()">Aktifkan Notifikasi</button>
 
-  <div id="map"></div>
+<div id="map"></div>
 
-  <!-- Leaflet Map + Script Risiko + OneSignal -->
-  <script>
-    // ======== Leaflet Map ========
-    var map = L.map('map').setView([-0.9, 109.3], 7); // contoh koordinat Kalimantan Barat
-    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-      attribution: '© OpenStreetMap'
-    }).addTo(map);
+<!-- OneSignal SDK -->
+<script src="https://cdn.onesignal.com/sdks/OneSignalSDK.js" async=""></script>
 
-    // ======== Fungsi Risiko ========
-    function hitungRisiko() {
-      var gel = document.getElementById('gelombang').value;
-      var arus = document.getElementById('arus').value;
-      var pasut = document.getElementById('pasut').value;
-
-      // ✅ Validasi input lengkap
-      if(gel === "" || arus === "" || pasut === "") {
-        alert("⚠ Harap lengkapi semua data (Gelombang, Arus, Pasang Surut)!");
-        document.getElementById('banner-notif').style.display = "none"; // sembunyikan banner
-        return;
+<script>
+  // ======== Inisialisasi OneSignal ========
+  window.OneSignal = window.OneSignal || [];
+  OneSignal.push(function() {
+    OneSignal.init({
+      appId: "YOUR_ONESIGNAL_APP_ID", // Ganti dengan App ID asli OneSignal
+      notifyButton: { enable: true },
+      welcomeNotification: {
+        "title": "Fadil's Org App",
+        "message": "Terima kasih sudah subscribe!"
       }
-
-      // Konversi ke angka
-      gel = parseFloat(gel);
-      arus = parseFloat(arus);
-      pasut = parseFloat(pasut);
-
-      // Hitung risiko
-      var risiko = (gel>2 || arus>1.5 || pasut>1.5) ? "Tinggi" : "Normal";
-
-      // Tampilkan banner jika tinggi
-      document.getElementById('banner-notif').style.display = (risiko==="Tinggi") ? "block" : "none";
-
-      alert("Risiko Abrasi: " + risiko);
-    }
-
-    // ======== OneSignal ========
-    var OneSignal = window.OneSignal || [];
-    OneSignal.push(function() {
-      OneSignal.init({
-        appId: "2a8e7210-8ea3-4ef9-951b-fcf1497599cc", // Ganti dengan App ID asli
-        notifyButton: { enable:true },
-        welcomeNotification: {
-          "title": "Fadil's Org App",
-          "message": "Terima kasih sudah subscribe!"
-        }
-      });
     });
+  });
 
-    function mintaIzinNotifikasi() {
-      console.log("Tombol Aktifkan Notifikasi diklik");
-      OneSignal.push(function() {
-        OneSignal.showSlidedownPrompt();
-      });
+  function aktifkanNotifikasi() {
+    OneSignal.push(function() {
+      OneSignal.showSlidedownPrompt(); // munculkan prompt izin
+    });
+  }
+
+  // ======== Fungsi Risiko ========
+  function hitungRisiko() {
+    let gel = document.getElementById("gelombang").value;
+    let arus = document.getElementById("arus").value;
+    let pasut = document.getElementById("pasut").value;
+
+    // ✅ Validasi input lengkap
+    if(gel === "" || arus === "" || pasut === "") {
+      alert("⚠ Harap lengkapi semua data (Gelombang, Arus, Pasang Surut)!");
+      document.getElementById("banner-notif").style.display = "none";
+      document.getElementById("hasil")?.remove();
+      return;
     }
-  </script>
 
-  <!-- OneSignal SDK -->
-  <script src="https://cdn.onesignal.com/sdks/OneSignalSDK.js" async=""></script>
+    gel = parseFloat(gel);
+    arus = parseFloat(arus);
+    pasut = parseFloat(pasut);
+
+    // Hitung risiko (contoh ambang)
+    let risiko = (gel>2 || arus>1.5 || pasut>1.5) ? "Tinggi" : "Rendah";
+
+    // Tampilkan banner dan kirim notifikasi jika tinggi
+    let banner = document.getElementById("banner-notif");
+    if(risiko === "Tinggi") {
+      banner.style.display = "block";
+      OneSignal.push(function() {
+        OneSignal.sendSelfNotification(
+          "⚠ Risiko Abrasi Tinggi!",
+          "Gelombang atau arus tinggi terdeteksi, harap waspada!",
+          window.location.href,
+          'https://example.com/icon.png' // optional icon
+        );
+      });
+      alert("⚠ Risiko Abrasi: TINGGI");
+    } else {
+      banner.style.display = "none";
+      alert("✅ Risiko Abrasi: Rendah");
+    }
+  }
+
+  // ======== Leaflet Map ========
+  var map = L.map('map').setView([-0.7893, 113.9213], 5);
+  L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+    attribution: '© OpenStreetMap'
+  }).addTo(map);
+</script>
 
 </body>
 </html>
-
