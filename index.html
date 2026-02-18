@@ -3,16 +3,18 @@
 <head>
   <meta charset="UTF-8">
   <title>Sistem Peringatan Dini Abrasi Pesisir</title>
-
-  <!-- Leaflet Map -->
   <link rel="stylesheet" href="https://unpkg.com/leaflet/dist/leaflet.css" />
   <script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
-
   <link rel="stylesheet" href="style.css">
 </head>
 <body>
 
   <h1>🌊 Sistem Peringatan Dini Abrasi Pesisir</h1>
+
+  <!-- Banner Notifikasi -->
+  <div id="banner-notif" style="display:none; background-color:#ff6961; color:white; text-align:center; padding:15px; font-weight:bold;">
+    ⚠ Risiko Abrasi Tinggi! Harap waspada!
+  </div>
 
   <div class="card">
     <label>Tinggi Gelombang (m)</label>
@@ -29,9 +31,9 @@
 
   <div id="hasil" class="status"></div>
 
-  <button onclick="aktifkanNotifikasi()">Aktifkan Notifikasi</button>
+  <button onclick="mintaIzinNotifikasi()">Aktifkan Notifikasi</button>
 
-  <div id="map"></div>
+  <div id="map" style="height:400px;"></div>
 
   <script src="script.js"></script>
 </body>
