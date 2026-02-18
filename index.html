@@ -5,14 +5,23 @@
   <title>Sistem Peringatan Dini Abrasi Pesisir</title>
   <link rel="stylesheet" href="https://unpkg.com/leaflet/dist/leaflet.css" />
   <script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
-  <link rel="stylesheet" href="style.css">
+  <style>
+    body { font-family: Arial, sans-serif; margin:20px; }
+    h1 { text-align:center; }
+    .card { max-width:400px; margin:20px auto; padding:20px; border:1px solid #ccc; border-radius:10px; }
+    label { display:block; margin-top:10px; }
+    input { width:100%; padding:5px; margin-top:5px; }
+    button { margin-top:15px; padding:10px 15px; cursor:pointer; }
+    #banner-notif { display:none; margin-top:15px; }
+    #map { height:400px; margin-top:20px; }
+  </style>
 </head>
 <body>
 
   <h1>🌊 Sistem Peringatan Dini Abrasi Pesisir</h1>
 
   <!-- Banner Notifikasi -->
-  <div id="banner-notif" style="display:none; background-color:#ff6961; color:white; text-align:center; padding:15px; font-weight:bold;">
+  <div id="banner-notif" style="background-color:#ff6961; color:white; text-align:center; padding:15px; font-weight:bold;">
     ⚠ Risiko Abrasi Tinggi! Harap waspada!
   </div>
 
@@ -29,39 +38,50 @@
     <button onclick="hitungRisiko()">Cek Risiko Abrasi</button>
   </div>
 
-  <div id="hasil" class="status"></div>
-
   <button onclick="mintaIzinNotifikasi()">Aktifkan Notifikasi</button>
 
-  <div id="map" style="height:400px;"></div>
+  <div id="map"></div>
 
-  <script src="script.js"></script>
-
-  <!-- OneSignal SDK -->
-  <script src="https://cdn.onesignal.com/sdks/OneSignalSDK.js" async=""></script>
   <script>
-    window.OneSignal = window.OneSignal || [];
+    // ======== Leaflet Map ========
+    var map = L.map('map').setView([-0.9, 109.3], 7); // contoh koordinat Kalimantan Barat
+    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+      attribution: '© OpenStreetMap'
+    }).addTo(map);
+
+    // ======== Fungsi Risiko ========
+    function hitungRisiko() {
+      var gel = parseFloat(document.getElementById('gelombang').value) || 0;
+      var arus = parseFloat(document.getElementById('arus').value) || 0;
+      var pasut = parseFloat(document.getElementById('pasut').value) || 0;
+
+      // logika sederhana: risiko tinggi jika gel >2.0 atau arus >1.5 atau pasut >1.5
+      var risiko = (gel>2 || arus>1.5 || pasut>1.5) ? "Tinggi" : "Normal";
+
+      document.getElementById('banner-notif').style.display = (risiko==="Tinggi") ? "block" : "none";
+      alert("Risiko Abrasi: " + risiko);
+    }
+
+    // ======== OneSignal ========
+    var OneSignal = window.OneSignal || [];
     OneSignal.push(function() {
       OneSignal.init({
-        appId: "816b5b26-e157-4c9a-8949-02db1b526471", // Ganti dengan App ID OneSignal kamu
-        notifyButton: {
-          enable: true // tombol subscribe otomatis muncul
-        },
+        appId: "YOUR_ONESIGNAL_APP_ID", // Ganti dengan App ID asli
+        notifyButton: { enable:true },
         welcomeNotification: {
           "title": "Fadil's Org App",
-          "message": "Thanks for subscribing!"
+          "message": "Terima kasih sudah subscribe!"
         }
       });
     });
 
-    // Fungsi minta izin manual dari tombol
     function mintaIzinNotifikasi() {
+      console.log("Tombol Aktifkan Notifikasi diklik");
       OneSignal.push(function() {
-        OneSignal.showSlidedownPrompt(); // memunculkan prompt izin push
+        OneSignal.showSlidedownPrompt();
       });
     }
   </script>
 
 </body>
 </html>
-
