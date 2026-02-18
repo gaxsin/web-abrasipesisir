@@ -12,7 +12,7 @@
     label { display:block; margin-top:10px; }
     input { width:100%; padding:5px; margin-top:5px; }
     button { margin-top:15px; padding:10px 15px; cursor:pointer; }
-    #banner-notif { display:none; margin-top:15px; }
+    #banner-notif { display:none; margin-top:15px; background-color:#ff6961; color:white; text-align:center; padding:15px; font-weight:bold; }
     #map { height:400px; margin-top:20px; }
   </style>
 </head>
@@ -21,7 +21,7 @@
   <h1>🌊 Sistem Peringatan Dini Abrasi Pesisir</h1>
 
   <!-- Banner Notifikasi -->
-  <div id="banner-notif" style="background-color:#ff6961; color:white; text-align:center; padding:15px; font-weight:bold;">
+  <div id="banner-notif">
     ⚠ Risiko Abrasi Tinggi! Harap waspada!
   </div>
 
@@ -42,6 +42,7 @@
 
   <div id="map"></div>
 
+  <!-- Leaflet Map + Script Risiko + OneSignal -->
   <script>
     // ======== Leaflet Map ========
     var map = L.map('map').setView([-0.9, 109.3], 7); // contoh koordinat Kalimantan Barat
@@ -55,9 +56,10 @@
       var arus = document.getElementById('arus').value;
       var pasut = document.getElementById('pasut').value;
 
-      // Validasi input
+      // ✅ Validasi input lengkap
       if(gel === "" || arus === "" || pasut === "") {
         alert("⚠ Harap lengkapi semua data (Gelombang, Arus, Pasang Surut)!");
+        document.getElementById('banner-notif').style.display = "none"; // sembunyikan banner
         return;
       }
 
@@ -79,7 +81,7 @@
     var OneSignal = window.OneSignal || [];
     OneSignal.push(function() {
       OneSignal.init({
-        appId: "YOUR_ONESIGNAL_APP_ID", // Ganti dengan App ID asli dari OneSignal
+        appId: "816b5b26-e157-4c9a-8949-02db1b526471", // Ganti dengan App ID asli
         notifyButton: { enable:true },
         welcomeNotification: {
           "title": "Fadil's Org App",
