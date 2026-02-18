@@ -5,8 +5,19 @@
   <title>Sistem Peringatan Dini Abrasi Pesisir</title>
   <link rel="stylesheet" href="https://unpkg.com/leaflet/dist/leaflet.css" />
   <script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
+  <style>
+    body { font-family: Arial; margin:20px; }
+    h1 { text-align:center; }
+    .card { max-width:400px; margin:20px auto; padding:20px; border:1px solid #ccc; border-radius:10px; }
+    label { display:block; margin-top:10px; }
+    input { width:100%; padding:5px; margin-top:5px; }
+    button { margin-top:15px; padding:10px 15px; cursor:pointer; }
+    #banner-notif { display:none; margin-top:15px; background-color:#ff6961; color:white; text-align:center; padding:15px; font-weight:bold; }
+    #map { height:400px; margin-top:20px; }
+  </style>
 </head>
 <body>
+
 <h1>🌊 Sistem Peringatan Dini Abrasi Pesisir</h1>
 
 <div class="card">
@@ -19,50 +30,62 @@
   <label>Pasang Surut (m)</label>
   <input type="number" id="pasut" step="0.1">
 
-  <button onclick="cekManual()">Cek Risiko Manual</button>
+  <button onclick="cekRisiko()">Cek Risiko</button>
 </div>
 
-<div id="map" style="height:400px;"></div>
+<div id="banner-notif">⚠ Risiko Abrasi Tinggi! Harap waspada!</div>
+
+<div id="map"></div>
 
 <!-- OneSignal SDK -->
 <script src="https://cdn.onesignal.com/sdks/OneSignalSDK.js" async=""></script>
+
 <script>
-window.OneSignal = window.OneSignal || [];
-OneSignal.push(function() {
-  OneSignal.init({
-    appId: "YOUR_ONESIGNAL_APP_ID", // ganti dengan App ID OneSignal asli
-    notifyButton: { enable: true },
-    welcomeNotification: { title:"Fadil's Org App", message:"Terima kasih sudah subscribe!" }
-  });
-});
-
-// Manual cek risiko (optional)
-function cekManual() {
-  let gel = parseFloat(document.getElementById("gelombang").value || 0);
-  let arus = parseFloat(document.getElementById("arus").value || 0);
-  let pasut = parseFloat(document.getElementById("pasut").value || 0);
-
-  if(gel===0 && arus===0 && pasut===0){
-    alert("Isi semua data untuk cek risiko");
-    return;
-  }
-
-  if(gel>2 || arus>1.5 || pasut>1.5){
-    alert("⚠ Risiko Tinggi! Notifikasi akan dikirim ke subscriber.");
-    // Kirim request ke backend
-    fetch("https://YOUR_BACKEND_URL/send", {
-      method:"POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ title:"⚠ Risiko Abrasi Tinggi!", message:"Gelombang atau arus tinggi terdeteksi!" })
+  // ===== OneSignal Init =====
+  window.OneSignal = window.OneSignal || [];
+  OneSignal.push(function() {
+    OneSignal.init({
+      appId: "YOUR_ONESIGNAL_APP_ID", // ganti dengan App ID asli
+      notifyButton: { enable: true },
+      welcomeNotification: { title:"Fadil's Org App", message:"Terima kasih sudah subscribe!" }
     });
-  } else {
-    alert("✅ Risiko Rendah");
-  }
-}
+  });
 
-// Leaflet map
-var map = L.map('map').setView([-0.7893, 113.9213], 5);
-L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', { attribution:'© OpenStreetMap' }).addTo(map);
+  // ===== Fungsi Cek Risiko =====
+  function cekRisiko() {
+    let gel = parseFloat(document.getElementById("gelombang").value || 0);
+    let arus = parseFloat(document.getElementById("arus").value || 0);
+    let pasut = parseFloat(document.getElementById("pasut").value || 0);
+
+    if(gel===0 || arus===0 || pasut===0){
+      alert("⚠ Harap lengkapi semua data!");
+      return;
+    }
+
+    let risiko = (gel>2 || arus>1.5 || pasut>1.5);
+
+    const banner = document.getElementById("banner-notif");
+    if(risiko){
+      banner.style.display = "block";
+      alert("⚠ Risiko Tinggi! Notifikasi akan dikirim ke semua subscriber.");
+      // Kirim ke backend
+      fetch("https://YOUR_BACKEND_URL/send", {
+        method:"POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          title: "⚠ Risiko Abrasi Tinggi!",
+          message: "Gelombang atau arus tinggi terdeteksi, harap waspada!"
+        })
+      });
+    } else {
+      banner.style.display = "none";
+      alert("✅ Risiko Rendah");
+    }
+  }
+
+  // ===== Leaflet Map =====
+  var map = L.map('map').setView([-0.7893, 113.9213], 5);
+  L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', { attribution:'© OpenStreetMap' }).addTo(map);
 </script>
 </body>
 </html>
