@@ -41,12 +41,12 @@
 <script src="https://cdn.onesignal.com/sdks/OneSignalSDK.js" async=""></script>
 
 <script>
-  // ===== OneSignal Init =====
+  // ===== OneSignal Init (tombol subscribe otomatis muncul) =====
   window.OneSignal = window.OneSignal || [];
   OneSignal.push(function() {
     OneSignal.init({
-      appId: "YOUR_ONESIGNAL_APP_ID", // ganti dengan App ID asli
-      notifyButton: { enable: true },
+      appId: "2a8e7210-8ea3-4ef9-951b-fcf1497599cc", // App ID asli
+      notifyButton: { enable: true }, // tombol subscribe otomatis muncul
       welcomeNotification: { title:"Fadil's Org App", message:"Terima kasih sudah subscribe!" }
     });
   });
@@ -68,15 +68,17 @@
     if(risiko){
       banner.style.display = "block";
       alert("⚠ Risiko Tinggi! Notifikasi akan dikirim ke semua subscriber.");
-      // Kirim ke backend
-      fetch("https://YOUR_BACKEND_URL/send", {
+
+      // Kirim ke backend untuk push ke HP / browser
+      fetch("https://gaxsin.github.io/web-abrasipesisir/", {
         method:"POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
           title: "⚠ Risiko Abrasi Tinggi!",
-          message: "Gelombang atau arus tinggi terdeteksi, harap waspada!"
+          message: `Gelombang: ${gel} m, Arus: ${arus} m/s, Pasang Surut: ${pasut} m`
         })
       });
+
     } else {
       banner.style.display = "none";
       alert("✅ Risiko Rendah");
