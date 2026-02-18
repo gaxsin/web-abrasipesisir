@@ -51,14 +51,27 @@
 
     // ======== Fungsi Risiko ========
     function hitungRisiko() {
-      var gel = parseFloat(document.getElementById('gelombang').value) || 0;
-      var arus = parseFloat(document.getElementById('arus').value) || 0;
-      var pasut = parseFloat(document.getElementById('pasut').value) || 0;
+      var gel = document.getElementById('gelombang').value;
+      var arus = document.getElementById('arus').value;
+      var pasut = document.getElementById('pasut').value;
 
-      // logika sederhana: risiko tinggi jika gel >2.0 atau arus >1.5 atau pasut >1.5
+      // Validasi input
+      if(gel === "" || arus === "" || pasut === "") {
+        alert("⚠ Harap lengkapi semua data (Gelombang, Arus, Pasang Surut)!");
+        return;
+      }
+
+      // Konversi ke angka
+      gel = parseFloat(gel);
+      arus = parseFloat(arus);
+      pasut = parseFloat(pasut);
+
+      // Hitung risiko
       var risiko = (gel>2 || arus>1.5 || pasut>1.5) ? "Tinggi" : "Normal";
 
+      // Tampilkan banner jika tinggi
       document.getElementById('banner-notif').style.display = (risiko==="Tinggi") ? "block" : "none";
+
       alert("Risiko Abrasi: " + risiko);
     }
 
@@ -66,7 +79,7 @@
     var OneSignal = window.OneSignal || [];
     OneSignal.push(function() {
       OneSignal.init({
-        appId: "YOUR_ONESIGNAL_APP_ID", // Ganti dengan App ID asli
+        appId: "YOUR_ONESIGNAL_APP_ID", // Ganti dengan App ID asli dari OneSignal
         notifyButton: { enable:true },
         welcomeNotification: {
           "title": "Fadil's Org App",
@@ -82,6 +95,9 @@
       });
     }
   </script>
+
+  <!-- OneSignal SDK -->
+  <script src="https://cdn.onesignal.com/sdks/OneSignalSDK.js" async=""></script>
 
 </body>
 </html>
